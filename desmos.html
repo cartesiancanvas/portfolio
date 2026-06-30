@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Desmos Art Gallery | Cartesian Canvas</title>
+    <meta name="description" content="A collection of mathematical art made in Desmos by Shirsendu Talukder">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #080b14;
+            --bg2: #101626;
+            --accent: #1A56B0;
+            --accent-light: #4d8cff;
+            --text: #f8fafc;
+            --muted: #a0aec0;
+            --glass: rgba(255,255,255,0.06);
+            --glass-border: rgba(255,255,255,0.12);
+            --shadow: 0 10px 40px rgba(0,0,0,0.35);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            overflow-x: hidden;
+            line-height: 1.7;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* Background glow */
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            background:
+                radial-gradient(circle at 20% 20%, rgba(26,86,176,.18), transparent 40%),
+                radial-gradient(circle at 80% 70%, rgba(77,140,255,.15), transparent 40%);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* ── NAVBAR ── */
+        .navbar {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 6%;
+            backdrop-filter: blur(12px);
+            background: rgba(0,0,0,0.2);
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            z-index: 999;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text);
+            letter-spacing: 0.5px;
+        }
+
+        .logo-img {
+            height: 42px;
+            width: 42px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 2px solid rgba(77,140,255,0.5);
+            box-shadow: 0 0 12px rgba(77,140,255,0.3), 0 0 24px rgba(77,140,255,0.1);
+            transition: 0.35s ease;
+            position: relative;
+            top: -3px;
+        }
+
+        .logo:hover .logo-img {
+            border-color: var(--accent-light);
+            box-shadow: 0 0 18px rgba(77,140,255,0.5), 0 0 36px rgba(77,140,255,0.2);
+            transform: rotate(8deg) scale(1.08);
+        }
+
+        .logo:hover { color: var(--accent-light); }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: var(--text);
+            text-decoration: none;
+            transition: 0.3s;
+        }
+
+        .nav-links a:hover { color: var(--accent-light); }
+
+        /* ── HERO ── */
+        .gallery-hero {
+            padding: 10rem 6% 4rem;
+            text-align: center;
+        }
+
+        .gallery-hero .eyebrow {
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            color: var(--accent-light);
+            font-size: 0.85rem;
+            margin-bottom: 1rem;
+        }
+
+        .gallery-hero h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2.5rem, 6vw, 4.5rem);
+            font-weight: 700;
+            letter-spacing: -0.03em;
+            margin-bottom: 1rem;
+        }
+
+        .gallery-hero p {
+            color: var(--muted);
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto 1.5rem;
+        }
+
+        .count-badge {
+            display: inline-block;
+            background: rgba(77,140,255,0.12);
+            border: 1px solid rgba(77,140,255,0.3);
+            color: var(--accent-light);
+            padding: 0.4rem 1.2rem;
+            border-radius: 999px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        /* ── FILTER TABS ── */
+        .filter-bar {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            padding: 0 6% 3rem;
+        }
+
+        .filter-btn {
+            padding: 0.5rem 1.2rem;
+            border-radius: 999px;
+            border: 1px solid var(--glass-border);
+            background: var(--glass);
+            color: var(--muted);
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: 0.3s;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .filter-btn:hover,
+        .filter-btn.active {
+            background: rgba(77,140,255,0.15);
+            border-color: rgba(77,140,255,0.4);
+            color: var(--accent-light);
+        }
+
+        /* ── GALLERY GRID ── */
+        .gallery-section {
+            width: min(1300px, 90%);
+            margin: 0 auto;
+            padding-bottom: 6rem;
+        }
+
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 1.8rem;
+        }
+
+        /* ── DESMOS CARD ── */
+        .desmos-card {
+            background: var(--glass);
+            backdrop-filter: blur(18px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: 0.35s;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .desmos-card:hover {
+            transform: translateY(-6px) scale(1.01);
+            border-color: rgba(77,140,255,0.35);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(77,140,255,0.15);
+        }
+
+        .iframe-wrapper {
+            position: relative;
+            width: 100%;
+            padding-top: 100%; /* 1:1 ratio */
+            overflow: hidden;
+        }
+
+        .iframe-wrapper iframe {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+            filter: invert(0.05) hue-rotate(5deg);
+        }
+
+        .card-info {
+            padding: 1.2rem 1.5rem 1.5rem;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+
+        .card-tag {
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--accent-light);
+            font-weight: 500;
+        }
+
+        .card-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.15rem;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .card-desc {
+            color: var(--muted);
+            font-size: 0.88rem;
+            line-height: 1.5;
+        }
+
+        /* ── FOOTER ── */
+        footer {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: var(--muted);
+            border-top: 1px solid rgba(255,255,255,0.06);
+        }
+
+        footer a {
+            color: var(--accent-light);
+            text-decoration: none;
+        }
+
+        /* ── MOBILE ── */
+        @media (max-width: 900px) {
+            .navbar { flex-direction: column; gap: 1rem; }
+            .nav-links { flex-wrap: wrap; justify-content: center; gap: 1rem; }
+            .gallery-grid { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 600px) {
+            .gallery-hero h1 { font-size: 2.2rem; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+    <a href="index.html" class="logo">
+        <img src="CartesianCanvas.jpg" alt="Cartesian Canvas Logo" class="logo-img">
+        Cartesian Canvas
+    </a>
+    <ul class="nav-links">
+        <li><a href="index.html#about">About</a></li>
+        <li><a href="index.html#research">Research</a></li>
+        <li><a href="index.html#projects">Projects</a></li>
+        <li><a href="index.html#achievements">Achievements</a></li>
+        <li><a href="index.html#contact">Contact</a></li>
+    </ul>
+</nav>
+
+<!-- HERO -->
+<section class="gallery-hero">
+    <p class="eyebrow">Mathematical Art</p>
+    <h1>Desmos Gallery</h1>
+    <p>Equations brought to life — parametric curves, polar flowers, linear transformations and more, all crafted in Desmos.</p>
+    <span class="count-badge">20 pieces</span>
+</section>
+
+<!-- FILTER TABS -->
+<div class="filter-bar">
+    <button class="filter-btn active" onclick="filterCards('all', this)">All</button>
+    <button class="filter-btn" onclick="filterCards('polar', this)">Polar</button>
+    <button class="filter-btn" onclick="filterCards('parametric', this)">Parametric</button>
+    <button class="filter-btn" onclick="filterCards('art', this)">Art & Figures</button>
+    <button class="filter-btn" onclick="filterCards('animation', this)">Animation</button>
+    <button class="filter-btn" onclick="filterCards('math', this)">Pure Math</button>
+</div>
+
+<!-- GALLERY -->
+<section class="gallery-section">
+    <div class="gallery-grid" id="gallery">
+
+        <div class="desmos-card" data-tag="parametric">
+            <div class="iframe-wrapper">
+                <iframe src="https://www.desmos.com/calculator/1896d627e6?embed" loading="lazy"></iframe>
+            </div>
+            <div class="card-info">
+                <span class="card-tag">Parametric</span>
+                <h3 class="card-title">Super Shapes</h3>
+                <p class="card-desc">Super formula-based parametric shapes.</p>
+            </div>
+        </div>
+        
+        <div class="desmos-card" data-tag="parametric">
+            <div class="iframe-wrapper">
+                <iframe src="https://www.desmos.com/calculator/ba1eea7f5b?embed" loading="lazy"></iframe>
+            </div>
+            <div class="card-info">
+                <span class="card-tag">Parametric</span>
+                <h3 class="card-title">Super Shapes 2</h3>
+                <p class="card-desc">Super formula-based parametric shapes.</p>
+            </div>
+        </div>
+
+        <div class="desmos-card" data-tag="animation">
+            <div class="iframe-wrapper">
+                <iframe src="https://www.desmos.com/calculator/3e2f6e630b?embed" loading="lazy"></iframe>
+            </div>
+            <div class="card-info">
+                <span class="card-tag">Animation</span>
+                <h3 class="card-title">Sunflower in the Wind</h3>
+                <p class="card-desc">Rotated ellipses arranged in a spiral, animated to sway like petals in a breeze.</p>
+            </div>
+        </div>
+
+        <div class="desmos-card" data-tag="art">
+            <div class="iframe-wrapper">
+                <iframe src="https://www.desmos.com/calculator/1a31868b86?embed" loading="lazy"></iframe>
+            </div>
+            <div class="card-info">
+                <span class="card-tag">Art</span>
+                <h3 class="card-title">Cityscape</h3>
+                <p class="card-desc">A city skyline built from piecewise functions and inequalities</p>
+            </div>
+        </div> 
+
+        <div class="desmos-card" data-tag="math">
+            <div class="iframe-wrapper">
+                <iframe src="https://www.desmos.com/calculator/4bba6a00a0?embed" loading="lazy"></iframe>
+            </div>
+            <div class="card-info">
+                <span class="card-tag">Pure Math</span>
+                <h3 class="card-title">Linear Transformation ℝ² → ℝ²</h3>
+                <p class="card-desc">An interactive visualisation of linear transformations — watch how matrices warp the plane.</p>
+            </div>
+        </div>
+
+        <div class="desmos-card" data-tag="polar">
+            <div class="iframe-wrapper">
+                <iframe src="https://www.desmos.com/calculator/d8f6f281c3?embed" loading="lazy"></iframe>
+            </div>
+            <div class="card-info">
+                <span class="card-tag">Polar</span>
+                <h3 class="card-title">Simple Flower</h3>
+                <p class="card-desc">A delicate polar rose curve blooming through trigonometric symmetry.</p>
+            </div>
+        </div>
+
+        <div class="desmos-card" data-tag="art">
+            <div class="iframe-wrapper">
+                <iframe src="https://www.desmos.com/calculator/6686bf2403?embed" loading="lazy"></iframe>
+            </div>
+            <div class="card-info">
+                <span class="card-tag">Art</span>
+                <h3 class="card-title">QR Rick Roll</h3>
+                <p class="card-desc">A functioning QR code drawn entirely in Desmos. Yes, it actually works. ^_~</p>
+            </div>
+        </div>
+
+        <div class="desmos-card" data-tag="polar">
+            <div class="iframe-wrapper">
+                <iframe src="https://www.desmos.com/calculator/aacbb601ba?embed" loading="lazy"></iframe>
+            </div>
+            <div class="card-info">
+                <span class="card-tag">Polar</span>
+                <h3 class="card-title">Polar Butterfly</h3>
+                <p class="card-desc">A polar curve tracing a butterfly-like structure through angular symmetry.</p>
+            </div>
+        </div>
+
+        <div class="desmos-card" data-tag="art">
+            <div class="iframe-wrapper">
+                <iframe src="https://www.desmos.com/calculator/c99760cf22?embed" loading="lazy"></iframe>
+            </div>
+            <div class="card-info">
+                <span class="card-tag">Art</span>
+                <h3 class="card-title">Valentine's Day 2020</h3>
+                <p class="card-desc">A mathematical love letter — hearts and curves for Valentine's Day 2020.</p>
+            </div>
+        </div>
+
+        <div class="desmos-card" data-tag="art">
+            <div class="iframe-wrapper">
+                <iframe src="https://www.desmos.com/calculator/94dc39ca76?embed" loading="lazy"></iframe>
+            </div>
+            <div class="card-info">
+                <span class="card-tag">Art</span>
+                <h3 class="card-title">Valentine's Day 2021</h3>
+                <p class="card-desc">The sequel — more intricate curves for the second year of mathematical romance.</p>
+            </div>
+        </div>
+
+        <div class="desmos-card" data-tag="parametric">
+            <div class="iframe-wrapper">
+                <iframe src="https://www.desmos.com/calculator/f86d017a04?embed" loading="lazy"></iframe>
+            </div>
+            <div class="card-info">
+                <span class="card-tag">Parametric</span>
+                <h3 class="card-title">Heart Curve</h3>
+                <p class="card-desc">A parametric heart — because every shape is just an equation waiting to be found.</p>
+            </div>
+        </div>
+
+        <div class="desmos-card" data-tag="polar">
+            <div class="iframe-wrapper">
+                <iframe src="https://www.desmos.com/calculator/in8macxawl?embed" loading="lazy"></iframe>
+            </div>
+            <div class="card-info">
+                <span class="card-tag">Polar</span>
+                <h3 class="card-title">Polar Violet Flower</h3>
+                <p class="card-desc">A simple polar violet — elegance through minimalism in the angular domain.</p>
+            </div>
+        </div>
+
+        <div class="desmos-card" data-tag="parametric">
+            <div class="iframe-wrapper">
+                <iframe src="https://www.desmos.com/calculator/e6de6940eb?embed" loading="lazy"></iframe>
+            </div>
+            <div class="card-info">
+                <span class="card-tag">Parametric</span>
+                <h3 class="card-title">Parametric Extravaganza</h3>
+                <p class="card-desc">An explosion of parametric curves — layered, tangled, and beautiful.</p>
+            </div>
+        </div>
+
+        <div class="desmos-card" data-tag="art">
+            <div class="iframe-wrapper">
+                <iframe src="https://www.desmos.com/calculator/5ace6aa194?embed" loading="lazy"></iframe>
+            </div>
+            <div class="card-info">
+                <span class="card-tag">Art</span>
+                <h3 class="card-title">Owl — First Project</h3>
+                <p class="card-desc">Where it all began. My very first Desmos project — an owl drawn piece by piece.</p>
+            </div>
+        </div>
+
+        <div class="desmos-card" data-tag="math">
+            <div class="iframe-wrapper">
+                <iframe src="https://www.desmos.com/calculator/c43d37fa12?embed" loading="lazy"></iframe>
+            </div>
+            <div class="card-info">
+                <span class="card-tag">Pure Math</span>
+                <h3 class="card-title">Domain Colouring</h3>
+                <p class="card-desc">Complex analysis visualised — domain colouring maps the phase and magnitude of complex functions.</p>
+            </div>
+        </div>
+
+        <div class="desmos-card" data-tag="art">
+            <div class="iframe-wrapper">
+                <iframe src="https://www.desmos.com/calculator/747f53f184?embed" loading="lazy"></iframe>
+            </div>
+            <div class="card-info">
+                <span class="card-tag">Art</span>
+                <h3 class="card-title">Sanchayan</h3>
+                <p class="card-desc">A portrait of my friend Sanchayan.</p>
+            </div>
+        </div>
+
+        <div class="desmos-card" data-tag="art">
+            <div class="iframe-wrapper">
+                <iframe src="https://www.desmos.com/calculator/5660f6b23a?embed" loading="lazy"></iframe>
+            </div>
+            <div class="card-info">
+                <span class="card-tag">Art</span>
+                <h3 class="card-title">Little Action Figure</h3>
+                <p class="card-desc">A tiny action figure constructed from geometric primitives and inequalities.</p>
+            </div>
+        </div>
+        
+        <div class="desmos-card" data-tag="animation">
+            <div class="iframe-wrapper">
+                <iframe src="https://www.desmos.com/calculator/8208bdb3a2?embed" loading="lazy"></iframe>
+            </div>
+            <div class="card-info">
+                <span class="card-tag">Animation</span>
+                <h3 class="card-title">Bouncing Heart</h3>
+                <p class="card-desc">A heart curve animated to bounce — parametric motion meets mathematical affection.</p>
+            </div>
+        </div>
+
+        <div class="desmos-card" data-tag="art">
+            <div class="iframe-wrapper">
+                <iframe src="https://www.desmos.com/calculator/f309d38ba8?embed" loading="lazy"></iframe>
+            </div>
+            <div class="card-info">
+                <span class="card-tag">Art</span>
+                <h3 class="card-title">Happy Teacher's Day</h3>
+                <p class="card-desc">A mathematical tribute to teachers — because the best lessons are written in equations.</p>
+            </div>
+        </div>
+
+        <div class="desmos-card" data-tag="art">
+            <div class="iframe-wrapper">
+                <iframe src="https://www.desmos.com/calculator/4b6ffafdb4?embed" loading="lazy"></iframe>
+            </div>
+            <div class="card-info">
+                <span class="card-tag">Art</span>
+                <h3 class="card-title">Landscape Block</h3>
+                <p class="card-desc">A blocky, stylised landscape — nature reduced to its geometric essentials.</p>
+            </div>
+        </div>
+
+        <div class="desmos-card" data-tag="math">
+            <div class="iframe-wrapper">
+                <iframe src="https://www.desmos.com/calculator/01b8f63f81?embed" loading="lazy"></iframe>
+            </div>
+            <div class="card-info">
+                <span class="card-tag">Pure Math</span>
+                <h3 class="card-title">Image via Linear Transform</h3>
+                <p class="card-desc">Transforming images through linear maps — visualising how matrices act on every pixel.</p>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+    <p>← <a href="index.html">Back to Cartesian Canvas</a></p>
+    <p style="margin-top:0.5rem;">All graphs made with <a href="https://www.desmos.com" target="_blank">Desmos</a> by Shirsendu Talukder</p>
+</footer>
+
+<script>
+    function filterCards(tag, btn) {
+        // Update active button
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        // Filter cards
+        document.querySelectorAll('.desmos-card').forEach(card => {
+            if (tag === 'all' || card.dataset.tag === tag) {
+                card.style.display = 'flex';
+                card.style.animation = 'fadeIn 0.4s ease forwards';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    }
+</script>
+
+<style>
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(12px); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
+</style>
+
+</body>
+</html>

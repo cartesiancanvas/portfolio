@@ -25,7 +25,7 @@
       <!-- ===================================================== -->
       <nav class="navbar">
          <div class="logo">
-            <img src="CartesianCanvas.jpg" alt="Cartesian Canvas Logo" class="logo-img">
+            <img src="CartesianCanvas.webp" alt="Cartesian Canvas Logo" class="logo-img">
             Cartesian Canvas
          </div>
          <ul class="nav-links">
@@ -34,6 +34,7 @@
             <li><a href="#projects">Projects</a></li>
             <li><a href="#achievements">Achievements</a></li>
             <li><a href="#contact">Contact</a></li>
+            <li><a href="art.html">Gallery</a></li>
          </ul>
       </nav>
       <!-- ===================================================== -->
@@ -120,35 +121,94 @@
       <!-- ===================================================== -->
       <!-- PROJECTS                                              -->
       <!-- ===================================================== -->
-
       <section id="projects" class="section">
-         <h2 class="section-title">Mathematical Visualizations</h2>
-         <div class="cards-grid">
-            <a href="link-to-fireworks.html" class="glass-card project-card">
-               <h3>Mathematical Fireworks</h3>
-               <p>Interactive particle systems inspired by heart curves, rose curves, trochoids and epicycloids.</p>
-            </a>
-            <a href="https://github.com/cartesiancanvas/DesmosImageRenderer" class="glass-card project-card">
-               <h3>Desmos Image Renderer</h3>
-               <p>Convert images into Desmos-compatible plots using Python and computer vision.</p>
-            </a>
-            <a href="https://github.com/cartesiancanvas/Turtle-Image-Renderer" class="glass-card project-card">
-               <h3>Turtle Image Renderer</h3>
-               <p>Reconstruct images using Turtle Graphics.</p>
-            </a>
-            <a href="https://github.com/cartesiancanvas/Processing" class="glass-card project-card">
-               <h3>Processing Simulations</h3>
-               <p>Double Pendulum, Perlin Noise systems, and mathematical animations.</p>
-            </a>
-            <a href="link-to-touchdesigner.html" class="glass-card project-card">
-               <h3>TouchDesigner Visualizations</h3>
-               <p>Procedural graphics and real-time visual systems.</p>
-            </a>
-            <a href="desmos.html" class="glass-card project-card">
-               <h3>Desmos Art</h3>
-               <p>Images using mathematical equations.</p>
-            </a>
+         <h2 class="section-title">Projects</h2>
+
+         <!-- TAB BUTTONS -->
+         <div class="tab-bar">
+            <button class="tab-btn active" onclick="switchTab('software', this)">Software & ML</button>
+            <button class="tab-btn" onclick="switchTab('mathviz', this)">Mathematical Visualization</button>
+            <button class="tab-btn" onclick="switchTab('creative', this)">Creative Coding</button>
          </div>
+
+         <!-- SOFTWARE & ML -->
+         <div class="tab-panel active" id="tab-software">
+            <div class="cards-grid">
+               <div class="glass-card project-card">
+                  <h3>Software & ML Projects</h3>
+                  <p>Data science, machine learning and software projects coming soon.</p>
+               </div>
+            </div>
+         </div>
+
+         <!-- MATHEMATICAL VISUALIZATION -->
+         <div class="tab-panel" id="tab-mathviz">
+            <div class="cards-grid">
+               <a href="desmos.html" class="glass-card project-card">
+                  <h3>Desmos Art</h3>
+                  <p>Pieces of mathematical art — polar curves, parametric shapes, portraits and animations, all drawn with equations.</p>
+               </a>
+               <a href="https://github.com/cartesiancanvas/DesmosImageRenderer" class="glass-card project-card" target="_blank">
+                  <h3>Desmos Image Renderer</h3>
+                  <p>Convert images into Desmos-compatible plots using Python, OpenCV and computer vision.</p>
+               </a>
+               <a href="https://github.com/cartesiancanvas/Turtle-Image-Renderer" class="glass-card project-card" target="_blank">
+                  <h3>Turtle Image Renderer</h3>
+                  <p>Reconstruct images using Python's Turtle Graphics library.</p>
+               </a>
+               <a href="https://github.com/cartesiancanvas/Manim" class="glass-card project-card" target="_blank">
+                  <h3>Manim Animations</h3>
+                  <p>Mathematical animations built with the Manim library.</p>
+               </a>
+            </div>
+         </div>
+
+         <!-- CREATIVE CODING -->
+         <div class="tab-panel" id="tab-creative">
+            <div class="cards-grid">
+               <a href="link-to-fireworks.html" class="glass-card project-card">
+                  <h3>Bad Apple</h3>
+                  <p>The legendary Bad Apple! video rendered on YouTube captions, Notepad, Desktop, MS Paint and Chess.com.</p>
+               </a>
+               <a href="link-to-fireworks.html" class="glass-card project-card">
+                  <h3>Mathematical Fireworks</h3>
+                  <p>Interactive particle systems shaped by heart curves, rose curves, trochoids and epicycloids. Live on this site.</p>
+               </a>
+               <a href="https://github.com/cartesiancanvas/TouchDesigner" class="glass-card project-card" target="_blank">
+                  <h3>TouchDesigner Visualizations</h3>
+                  <p>Procedural graphics and real-time visual systems built with TouchDesigner's node-based GPU pipeline.</p>
+               </a>
+               <a href="https://github.com/cartesiancanvas/Processing" class="glass-card project-card" target="_blank">
+                  <h3>Processing Simulations</h3>
+                  <p>Double Pendulum, Perlin Noise systems and mathematical animations built in Processing.</p>
+               </a>
+               <a href="https://github.com/cartesiancanvas/LineTrails" class="glass-card project-card" target="_blank">
+                  <h3>Line Trails</h3>
+                  <p>Generative trails made up of flowing lines.</p>
+               </a>
+               <a href="https://github.com/cartesiancanvas/HypocycloidTrails" class="glass-card project-card" target="_blank">
+                  <h3>Hypocycloid Trails</h3>
+                  <p>Particle trails whose locus traces a hypocycloid — geometry in motion.</p>
+               </a>
+               <a href="https://github.com/cartesiancanvas/HeartParticles" class="glass-card project-card" target="_blank">
+                  <h3>Heart Particles</h3>
+                  <p>Particle systems constrained to heart-curve paths in Processing.</p>
+               </a>
+               <a href="https://github.com/cartesiancanvas/SpiralGalaxy" class="glass-card project-card" target="_blank">
+                  <h3>Spiral Galaxy</h3>
+                  <p>A generative spiral galaxy simulation.</p>
+               </a>
+               <a href="https://github.com/cartesiancanvas/ClockEye" class="glass-card project-card" target="_blank">
+                  <h3>Clock Eye</h3>
+                  <p>A creepy eyed clock — generative art meets timekeeping.</p>
+               </a>
+               <a href="https://github.com/cartesiancanvas/Turtle" class="glass-card project-card" target="_blank">
+                  <h3>Turtle Art</h3>
+                  <p>Generative drawing projects made with Python's Turtle library.</p>
+               </a>
+            </div>
+         </div>
+
       </section>
       <!-- ===================================================== -->
       <!-- ACHIEVEMENTS                                          -->
@@ -202,5 +262,65 @@
       </footer>
       <script src="sketches/Class.js"></script>
       <script src="sketches/Fireworks.js"></script>
+
+      <style>
+         /* ==========================================
+            PROJECT TABS
+         ========================================== */
+         .tab-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            margin-bottom: 2rem;
+         }
+
+         .tab-btn {
+            padding: 0.55rem 1.3rem;
+            border-radius: 999px;
+            border: 1px solid var(--glass-border);
+            background: var(--glass);
+            color: var(--muted);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: 0.3s;
+         }
+
+         .tab-btn:hover {
+            background: rgba(77,140,255,0.12);
+            border-color: rgba(77,140,255,0.35);
+            color: var(--accent-light);
+         }
+
+         .tab-btn.active {
+            background: rgba(77,140,255,0.18);
+            border-color: rgba(77,140,255,0.5);
+            color: var(--accent-light);
+            font-weight: 600;
+         }
+
+         .tab-panel {
+            display: none;
+            animation: fadeIn 0.35s ease forwards;
+         }
+
+         .tab-panel.active {
+            display: block;
+         }
+
+         @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to   { opacity: 1; transform: translateY(0); }
+         }
+      </style>
+
+      <script>
+         function switchTab(tab, btn) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+            btn.classList.add('active');
+            document.getElementById('tab-' + tab).classList.add('active');
+         }
+      </script>
    </body>
 </html>

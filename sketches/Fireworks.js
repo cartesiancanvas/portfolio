@@ -1,6 +1,6 @@
-const particle_count = 150;
-const max_particles = 500;
-const max_fparticles =300;
+const particle_count = 120;
+const max_particles = 400;
+const max_fparticles =250;
 var particles = [];
 var f_particles = [];
 let xPos;
@@ -44,6 +44,7 @@ function draw() {
     cursorX = lerp(cursorX, mouseX, 0.2);
     cursorY = lerp(cursorY, mouseY, 0.2);    
     stroke(0,0,1);
+    strokeWeight(1);
     rose(cursorX, cursorY, 30, map(sin(frameCount*0.02), -1, 1, 3, 11), frameCount * 0.05);
     
     if (flag == 1) {
@@ -91,7 +92,7 @@ function init(count) {
 function mouseMoved() {
     f_xPos = mouseX;
     f_yPos = mouseY;
-    init(10);
+    init(8);
 }
 
 function touchMoved() {

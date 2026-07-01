@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="theme-color" content="#080b14">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generative Art | Cartesian Canvas</title>
+    <meta name="description" content="Generative art and creative coding by Shirsendu Talukder">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #080b14;
+            --bg2: #101626;
+            --accent: #1A56B0;
+            --accent-light: #4d8cff;
+            --text: #f8fafc;
+            --muted: #a0aec0;
+            --glass: rgba(255,255,255,0.06);
+            --glass-border: rgba(255,255,255,0.12);
+            --shadow: 0 10px 40px rgba(0,0,0,0.35);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            overflow-x: hidden;
+            line-height: 1.7;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            background:
+                radial-gradient(circle at 20% 20%, rgba(26,86,176,.18), transparent 40%),
+                radial-gradient(circle at 80% 70%, rgba(77,140,255,.15), transparent 40%);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* ── NAVBAR ── */
+        .navbar {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 6%;
+            backdrop-filter: blur(12px);
+            background: rgba(0,0,0,0.2);
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            z-index: 999;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text);
+            letter-spacing: 0.5px;
+        }
+
+        .logo-img {
+            height: 42px;
+            width: 42px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 2px solid rgba(77,140,255,0.5);
+            box-shadow: 0 0 12px rgba(77,140,255,0.3), 0 0 24px rgba(77,140,255,0.1);
+            transition: 0.35s ease;
+            position: relative;
+            top: -3px;
+            transform: scale(1.2);
+        }
+
+        .logo:hover .logo-img {
+            border-color: var(--accent-light);
+            box-shadow: 0 0 18px rgba(77,140,255,0.5), 0 0 36px rgba(77,140,255,0.2);
+            transform: rotate(8deg) scale(1.08);
+        }
+
+        .logo:hover { color: var(--accent-light); }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: var(--text);
+            text-decoration: none;
+            transition: 0.3s;
+        }
+
+        .nav-links a:hover { color: var(--accent-light); }
+
+        /* ── HERO ── */
+        .gallery-hero {
+            padding: 10rem 6% 3rem;
+            text-align: center;
+        }
+
+        .eyebrow {
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            color: var(--accent-light);
+            font-size: 0.85rem;
+            margin-bottom: 1rem;
+        }
+
+        .gallery-hero h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2.5rem, 6vw, 4.5rem);
+            font-weight: 700;
+            letter-spacing: -0.03em;
+            margin-bottom: 1rem;
+        }
+
+        .gallery-hero p {
+            color: var(--muted);
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto 1.5rem;
+        }
+
+        /* ── FILTER BAR ── */
+        .filter-bar {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            padding: 0 6% 3rem;
+        }
+
+        .filter-btn {
+            padding: 0.5rem 1.2rem;
+            border-radius: 999px;
+            border: 1px solid var(--glass-border);
+            background: var(--glass);
+            color: var(--muted);
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: 0.3s;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .filter-btn:hover,
+        .filter-btn.active {
+            background: rgba(77,140,255,0.15);
+            border-color: rgba(77,140,255,0.4);
+            color: var(--accent-light);
+        }
+
+        /* ── MASONRY GRID ── */
+        .gallery-section {
+            width: min(1300px, 90%);
+            margin: 0 auto;
+            padding-bottom: 6rem;
+        }
+
+        .masonry-grid {
+            columns: 3;
+            column-gap: 1.5rem;
+        }
+
+        @media (max-width: 900px) { .masonry-grid { columns: 2; } }
+        @media (max-width: 560px) { .masonry-grid { columns: 1; } }
+
+        /* ── ART CARD ── */
+        .art-card {
+            break-inside: avoid;
+            margin-bottom: 1.5rem;
+            background: var(--glass);
+            backdrop-filter: blur(18px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            cursor: pointer;
+            transition: 0.35s;
+            display: block;
+        }
+
+        .art-card:hover {
+            transform: translateY(-6px) scale(1.01);
+            border-color: rgba(77,140,255,0.35);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(77,140,255,0.15);
+        }
+
+        /* Placeholder image area */
+        .art-img {
+            width: 100%;
+            display: block;
+            background: linear-gradient(135deg, rgba(26,86,176,0.15), rgba(77,140,255,0.08));
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Each placeholder has a different aspect ratio for masonry variety */
+        .art-img.ratio-1 { padding-top: 100%; }
+        .art-img.ratio-2 { padding-top: 75%; }
+        .art-img.ratio-3 { padding-top: 125%; }
+        .art-img.ratio-4 { padding-top: 60%; }
+
+        .art-img img {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .art-card:hover .art-img img {
+            transform: scale(1.05);
+        }
+
+        /* Placeholder SVG shown when no image */
+        .placeholder-inner {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            color: rgba(77,140,255,0.35);
+        }
+
+        .placeholder-inner svg {
+            width: 48px;
+            height: 48px;
+            opacity: 0.5;
+        }
+
+        .placeholder-inner span {
+            font-size: 0.78rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            opacity: 0.4;
+        }
+
+        .card-info {
+            padding: 1rem 1.2rem 1.3rem;
+        }
+
+        .card-tag {
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--accent-light);
+            font-weight: 500;
+        }
+
+        .card-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text);
+            margin-top: 0.2rem;
+        }
+
+        .card-tool {
+            color: var(--muted);
+            font-size: 0.82rem;
+            margin-top: 0.2rem;
+        }
+
+        /* ── LIGHTBOX ── */
+        .lightbox {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(16px);
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .lightbox.open {
+            display: flex;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .lightbox-inner {
+            max-width: 860px;
+            width: 100%;
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 30px 80px rgba(0,0,0,0.6);
+            position: relative;
+        }
+
+        .lightbox-img {
+            width: 100%;
+            max-height: 65vh;
+            object-fit: contain;
+            display: block;
+            background: #0a0d18;
+        }
+
+        /* Placeholder for lightbox when no image */
+        .lightbox-placeholder {
+            width: 100%;
+            height: 50vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, rgba(26,86,176,0.12), rgba(77,140,255,0.06));
+            color: rgba(77,140,255,0.3);
+            font-size: 0.85rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .lightbox-info {
+            padding: 1.5rem 2rem;
+        }
+
+        .lightbox-info .card-tag { font-size: 0.78rem; }
+        .lightbox-info .card-title {
+            font-size: 1.4rem;
+            margin: 0.3rem 0 0.5rem;
+        }
+        .lightbox-info .card-tool { font-size: 0.9rem; }
+
+        .lightbox-close {
+            position: absolute;
+            top: 1rem; right: 1rem;
+            background: rgba(0,0,0,0.5);
+            border: 1px solid var(--glass-border);
+            color: var(--text);
+            width: 36px; height: 36px;
+            border-radius: 50%;
+            font-size: 1.1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.2s;
+        }
+
+        .lightbox-close:hover {
+            background: rgba(77,140,255,0.2);
+            border-color: rgba(77,140,255,0.4);
+        }
+
+        /* ── FOOTER ── */
+        footer {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: var(--muted);
+            border-top: 1px solid rgba(255,255,255,0.06);
+        }
+
+        footer a {
+            color: var(--accent-light);
+            text-decoration: none;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.97); }
+            to   { opacity: 1; transform: scale(1); }
+        }
+
+        /* ── MOBILE ── */
+        @media (max-width: 900px) {
+            .navbar { flex-direction: column; gap: 1rem; }
+            .nav-links { flex-wrap: wrap; justify-content: center; gap: 1rem; }
+        }
+
+        /* ── UPLOAD HINT ── */
+        .upload-hint {
+            text-align: center;
+            color: var(--muted);
+            font-size: 0.85rem;
+            margin-bottom: 2.5rem;
+            opacity: 0.6;
+        }
+
+        .upload-hint code {
+            background: rgba(77,140,255,0.1);
+            border: 1px solid rgba(77,140,255,0.2);
+            padding: 0.1rem 0.5rem;
+            border-radius: 6px;
+            color: var(--accent-light);
+            font-size: 0.82rem;
+        }
+    </style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+    <a href="index.html" class="logo">
+        <img src="CartesianCanvas.webp" alt="Cartesian Canvas Logo" class="logo-img">
+        Cartesian Canvas
+    </a>
+    <ul class="nav-links">
+        <li><a href="index.html#about">About</a></li>
+        <li><a href="index.html#research">Research</a></li>
+        <li><a href="index.html#projects">Projects</a></li>
+        <li><a href="index.html#achievements">Achievements</a></li>
+        <li><a href="index.html#contact">Contact</a></li>
+    </ul>
+</nav>
+
+<!-- HERO -->
+<section class="gallery-hero">
+    <p class="eyebrow">Creative Coding</p>
+    <h1>Generative Art</h1>
+    <p>A visual archive of outputs from Processing, TouchDesigner, p5.js and beyond — where code meets canvas.</p>
+</section>
+
+<!-- GALLERY -->
+<section class="gallery-section">
+
+    <div class="masonry-grid" id="artGrid">
+        <div class="art-card" data-tag="processing" data-title="Perlin Heart" data-tool="Processing" onclick="openLightbox(this)">
+            <div class="art-img ratio-1">
+                <img src="assets/perlin_heart.png" alt="Perlin Heart">
+                <div class="placeholder-inner">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 0 1 0 20"/><path d="M2 12h20"/></svg>
+                    <span>Add Image</span>
+                </div>
+            </div>
+            <div class="card-info">
+                <span class="card-tag">Processing</span>
+                <h3 class="card-title">Perlin Heart</h3>
+                <p class="card-tool">Made in processing using Perlin Noise</p>
+            </div>
+        </div>
+
+        <div class="art-card" data-tag="Processing" data-title="Fractal Tree - 1" data-tool="processing" onclick="openLightbox(this)">
+            <div class="art-img ratio-2">
+                <img src="assets/fractree_1.png" alt="Fractal Tree - 1">
+                <div class="placeholder-inner">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 0 1 0 20"/><path d="M2 12h20"/></svg>
+                    <span>Add Image</span>
+                </div>
+            </div>
+            <div class="card-info">
+                <span class="card-tag">processing</span>
+                <h3 class="card-title">Fractal Tree - 1</h3>
+                <p class="card-tool">processing</p>
+            </div>
+        </div>
+
+        <div class="art-card" data-tag="touchdesigner" data-title="TouchDesigner Visual 1" data-tool="TouchDesigner" onclick="openLightbox(this)">
+            <div class="art-img ratio-3">
+                <!-- <img src="art/td-visual-1.png" alt="TouchDesigner Visual"> -->
+                <div class="placeholder-inner">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 0 1 0 20"/><path d="M2 12h20"/></svg>
+                    <span>Add Image</span>
+                </div>
+            </div>
+            <div class="card-info">
+                <span class="card-tag">TouchDesigner</span>
+                <h3 class="card-title">TouchDesigner Visual 1</h3>
+                <p class="card-tool">TouchDesigner</p>
+            </div>
+        </div>
+
+        <div class="art-card" data-tag="processing" data-title="Fractal Cherry Blossoms" data-tool="Processing" onclick="openLightbox(this)">
+            <div class="art-img ratio-1">
+            <img src="assets/frac_cherry.png" alt="Fractal Cherry Blossoms">
+                <div class="placeholder-inner">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 0 1 0 20"/><path d="M2 12h20"/></svg>
+                    <span>Add Image</span>
+                </div>
+            </div>
+            <div class="card-info">
+                <span class="card-tag">Processing</span>
+                <h3 class="card-title">Fractal Cherry Blossoms</h3>
+                <p class="card-tool">Processing</p>
+            </div>
+        </div>
+
+        <div class="art-card" data-tag="manim" data-title="Manim Animation" data-tool="Manim" onclick="openLightbox(this)">
+            <div class="art-img ratio-4">
+                <!-- <img src="art/manim-1.png" alt="Manim Animation"> -->
+                <div class="placeholder-inner">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 0 1 0 20"/><path d="M2 12h20"/></svg>
+                    <span>Add Image</span>
+                </div>
+            </div>
+            <div class="card-info">
+                <span class="card-tag">Manim</span>
+                <h3 class="card-title">Manim Animation</h3>
+                <p class="card-tool">Manim</p>
+            </div>
+        </div>
+
+        <div class="art-card" data-tag="touchdesigner" data-title="TouchDesigner Visual 2" data-tool="TouchDesigner" onclick="openLightbox(this)">
+            <div class="art-img ratio-2">
+                <!-- <img src="art/td-visual-2.png" alt="TouchDesigner Visual 2"> -->
+                <div class="placeholder-inner">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 0 1 0 20"/><path d="M2 12h20"/></svg>
+                    <span>Add Image</span>
+                </div>
+            </div>
+            <div class="card-info">
+                <span class="card-tag">TouchDesigner</span>
+                <h3 class="card-title">TouchDesigner Visual 2</h3>
+                <p class="card-tool">TouchDesigner</p>
+            </div>
+        </div>
+
+        <div class="art-card" data-tag="processing" data-title="Line Trails" data-tool="Processing / p5.js" onclick="openLightbox(this)">
+            <div class="art-img ratio-3">
+                <!-- <img src="art/line-trails.png" alt="Line Trails"> -->
+                <div class="placeholder-inner">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 0 1 0 20"/><path d="M2 12h20"/></svg>
+                    <span>Add Image</span>
+                </div>
+            </div>
+            <div class="card-info">
+                <span class="card-tag">Processing</span>
+                <h3 class="card-title">Line Trails</h3>
+                <p class="card-tool">Processing / p5.js</p>
+            </div>
+        </div>
+
+        <div class="art-card" data-tag="other" data-title="Bad Apple — Notepad" data-tool="Notepad / YT Captions" onclick="openLightbox(this)">
+            <div class="art-img ratio-1">
+                <!-- <img src="art/bad-apple.png" alt="Bad Apple on Notepad"> -->
+                <div class="placeholder-inner">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 0 1 0 20"/><path d="M2 12h20"/></svg>
+                    <span>Add Image</span>
+                </div>
+            </div>
+            <div class="card-info">
+                <span class="card-tag">Other</span>
+                <h3 class="card-title">Bad Apple — Notepad</h3>
+                <p class="card-tool">Notepad / YT Captions</p>
+            </div>
+        </div>
+
+        <div class="art-card" data-tag="processing" data-title="Clock Eye" data-tool="Processing" onclick="openLightbox(this)">
+            <div class="art-img ratio-2">
+                <!-- <img src="art/clock-eye.png" alt="Clock Eye"> -->
+                <div class="placeholder-inner">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 0 1 0 20"/><path d="M2 12h20"/></svg>
+                    <span>Add Image</span>
+                </div>
+            </div>
+            <div class="card-info">
+                <span class="card-tag">Processing</span>
+                <h3 class="card-title">Clock Eye</h3>
+                <p class="card-tool">Processing</p>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lightbox" onclick="closeLightboxOutside(event)">
+    <div class="lightbox-inner">
+        <button class="lightbox-close" onclick="closeLightbox()">✕</button>
+        <div id="lightbox-img-wrap"></div>
+        <div class="lightbox-info">
+            <span class="card-tag" id="lb-tag"></span>
+            <h3 class="card-title" id="lb-title"></h3>
+            <p class="card-tool" id="lb-tool"></p>
+        </div>
+    </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+    <p>← <a href="index.html">Back to Cartesian Canvas</a></p>
+</footer>
+
+<script>
+    // Lightbox
+    function openLightbox(card) {
+        const img = card.querySelector('img');
+        const wrap = document.getElementById('lightbox-img-wrap');
+        if (img) {
+            wrap.innerHTML = `<img class="lightbox-img" src="${img.src}" alt="${img.alt}">`;
+        } else {
+            wrap.innerHTML = `<div class="lightbox-placeholder">No image yet — add src to this card</div>`;
+        }
+        document.getElementById('lb-tag').textContent = card.dataset.tag.toUpperCase();
+        document.getElementById('lb-title').textContent = card.dataset.title;
+        document.getElementById('lb-tool').textContent = card.dataset.tool;
+        document.getElementById('lightbox').classList.add('open');
+    }
+
+    function closeLightbox() {
+        document.getElementById('lightbox').classList.remove('open');
+    }
+
+    function closeLightboxOutside(e) {
+        if (e.target === document.getElementById('lightbox')) closeLightbox();
+    }
+
+    document.addEventListener('keydown', e => {
+        if (e.key === 'Escape') closeLightbox();
+    });
+</script>
+
+</body>
+</html>

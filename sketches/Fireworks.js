@@ -1,6 +1,6 @@
 const particle_count = 150;
 const max_particles = 500;
-const max_fparticles =450;
+const max_fparticles =300;
 var particles = [];
 var f_particles = [];
 let xPos;
@@ -92,4 +92,12 @@ function mouseMoved() {
     f_xPos = mouseX;
     f_yPos = mouseY;
     init(10);
+}
+
+function touchMoved() {
+    if (touches.length > 0) {
+        f_xPos = touches[0].x;
+        f_yPos = touches[0].y;
+        init(3);
+    }
 }

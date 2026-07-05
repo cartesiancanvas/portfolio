@@ -26,6 +26,7 @@ function windowResized() {
 function setup() {
     let cnv = createCanvas(windowWidth, windowHeight);
     colorMode(HSB, 360, 1, 1, 255);
+    cnv.elt.addEventListener('touchmove', (e) => e.preventDefault(), { passive: false });
 }
 
 
